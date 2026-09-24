@@ -1,0 +1,6 @@
+{
+  "name": "Alif Personal CashFlow",
+  "description": "A personal financial management app for tracking income, expenses, debts, and budgeting with Jakarta timezone support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

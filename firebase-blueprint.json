@@ -1,0 +1,116 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Profil pengguna aplikasi pencatatan keuangan.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Alamat email pengguna."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Nama tampilan pengguna."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL foto profil pengguna."
+        },
+        "currency": {
+          "type": "string",
+          "description": "Mata uang yang digunakan (contoh: IDR)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Waktu akun dibuat."
+        }
+      },
+      "required": ["email", "createdAt"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Kategori transaksi (pemasukan/pengeluaran).",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "ID pengguna yang memiliki kategori ini."
+        },
+        "name": {
+          "type": "string",
+          "description": "Nama kategori."
+        },
+        "icon": {
+          "type": "string",
+          "description": "Nama ikon Lucide yang digunakan."
+        },
+        "color": {
+          "type": "string",
+          "description": "Kode warna hex untuk kategori."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["income", "expense"],
+          "description": "Tipe kategori: pemasukan atau pengeluaran."
+        }
+      },
+      "required": ["userId", "name", "type"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Data transaksi keuangan.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "ID pengguna yang melakukan transaksi."
+        },
+        "amount": {
+          "type": "number",
+          "description": "Jumlah uang transaksi."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["income", "expense"],
+          "description": "Tipe transaksi: pemasukan atau pengeluaran."
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "ID kategori transaksi."
+        },
+        "description": {
+          "type": "string",
+          "description": "Keterangan tambahan transaksi."
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Tanggal transaksi dilakukan."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Waktu data transaksi disimpan."
+        }
+      },
+      "required": ["userId", "amount", "type", "categoryId", "date", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Data profil pengguna."
+    },
+    "/users/{userId}/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Koleksi kategori kustom pengguna."
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Daftar transaksi keuangan pengguna."
+    }
+  }
+}
