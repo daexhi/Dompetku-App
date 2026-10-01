@@ -1,6 +1,6 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Wallet, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, getDaysInMonth, getDate } from 'date-fns';
 import { id } from 'date-fns/locale';
 
 interface DashboardProps {
@@ -33,6 +33,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   const today = new Date();
+  const daysInMonth = getDaysInMonth(today);
+  const currentDay = getDate(today);
+  const remainingDays = Math.max(1, daysInMonth - currentDay + 1);
+  const dailyAverage = balance / remainingDays;
 
   return (
     <div className="space-y-6">
@@ -111,8 +115,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <p className="text-[clamp(0.875rem,4.5vw,1.125rem)] font-bold text-slate-200 truncate">{formatCurrency(income - expense)}</p>
         </div>
         <div className="bg-slate-900/10 p-5 rounded-[2rem] border border-slate-900 shadow-sm min-w-0">
-          <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Rata Harian</p>
-          <p className="text-[clamp(0.875rem,4.5vw,1.125rem)] font-bold text-slate-200 truncate">{formatCurrency(expense / 30)}</p>
+          <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Rata-Rata Harian</p>
+          <p className="text-[clamp(0.875rem,4.5vw,1.125rem)] font-bold text-slate-200 truncate">{formatCurrency(dailyAverage)}</p>
         </div>
       </div>
     </div>
