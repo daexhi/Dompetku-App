@@ -61,7 +61,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({ transactions, 
             <div 
               key={tx.id} 
               onClick={() => onSelect?.(tx)}
-              className="group relative flex items-center gap-4 bg-slate-900/40 p-4 rounded-3xl border border-slate-800/50 shadow-sm hover:bg-slate-900/60 transition-all cursor-pointer"
+              className="group relative flex items-center gap-4 bg-slate-900/20 p-4 rounded-3xl border border-slate-900/50 shadow-sm hover:bg-slate-900/40 transition-all cursor-pointer"
             >
               <div 
                 className="p-3.5 rounded-[1.25rem] text-white shadow-xl shadow-black/20"

@@ -8,17 +8,20 @@ import { cn } from '../lib/utils';
 interface DebtManagerProps {
   debts: Debt[];
   onAdd: (debt: Omit<Debt, 'id' | 'createdAt'>) => void;
+  onUpdate: (debt: Debt) => void;
   onDelete: (id: string) => void;
   currency: string;
 }
 
-export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete, currency }) => {
+export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onUpdate, onDelete, currency }) => {
   const [isAdding, setIsAdding] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     amount: 0,
     tenor: 1,
     currentPeriod: 1,
+    monthlyInstallment: 0,
     startDate: format(new Date(), 'yyyy-MM-dd'),
   });
 
@@ -33,15 +36,57 @@ export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || formData.amount <= 0) return;
-    onAdd(formData);
+    
+    if (editingId) {
+      const existingDebt = debts.find(d => d.id === editingId);
+      if (existingDebt) {
+        onUpdate({
+          ...existingDebt,
+          ...formData
+        });
+      }
+      setEditingId(null);
+    } else {
+      onAdd(formData);
+    }
+
     setFormData({ 
       name: '', 
       amount: 0, 
       tenor: 1, 
       currentPeriod: 1, 
+      monthlyInstallment: 0,
       startDate: format(new Date(), 'yyyy-MM-dd') 
     });
     setIsAdding(false);
+  };
+
+  const handleEdit = (debt: Debt) => {
+    setFormData({
+      name: debt.name,
+      amount: debt.amount,
+      tenor: debt.tenor,
+      currentPeriod: debt.currentPeriod,
+      monthlyInstallment: debt.monthlyInstallment,
+      startDate: debt.startDate
+    });
+    setEditingId(debt.id);
+    setIsAdding(true);
+  };
+
+  const handlePay = (debt: Debt) => {
+    if (debt.amount <= 0 || debt.tenor <= 0) return;
+    
+    const newAmount = Math.max(0, debt.amount - debt.monthlyInstallment);
+    const newTenor = Math.max(0, debt.tenor - 1);
+    const newPeriod = debt.currentPeriod + 1;
+
+    onUpdate({
+      ...debt,
+      amount: newAmount,
+      tenor: newTenor,
+      currentPeriod: newPeriod
+    });
   };
 
   return (
@@ -56,8 +101,8 @@ export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete
         </button>
       </div>
 
-      {isAdding && (
-        <form onSubmit={handleSubmit} className="bg-slate-800/50 p-6 rounded-3xl border border-slate-700/50 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+        {isAdding && (
+        <form onSubmit={handleSubmit} className="bg-black p-6 rounded-3xl border border-slate-900 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="space-y-1">
             <label className="text-[10px] font-black text-slate-500 uppercase px-1">Nama Hutang</label>
             <input
@@ -65,7 +110,7 @@ export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete
               required
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
-              className="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              className="w-full bg-slate-950 border border-slate-900 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
               placeholder="Mis: Hutang Shopee"
             />
           </div>
@@ -77,16 +122,21 @@ export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete
               required
               value={formData.amount || ''}
               onChange={e => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
-              className="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-bold"
+              className="w-full bg-slate-950 border border-slate-900 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-bold"
               placeholder="0"
             />
           </div>
 
-          <div className="bg-slate-900/40 p-4 rounded-2xl border border-dashed border-slate-700">
-            <p className="text-[10px] font-black text-slate-500 uppercase mb-1">Estimasi Cicilan / Bulan</p>
-            <p className="text-lg font-black text-rose-400">
-              {formatCurrency(formData.amount / formData.tenor)}
-            </p>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-slate-500 uppercase px-1">Cicilan / Bulan</label>
+            <input
+              type="number"
+              required
+              value={formData.monthlyInstallment || ''}
+              onChange={e => setFormData({ ...formData, monthlyInstallment: parseFloat(e.target.value) })}
+              className="w-full bg-slate-950 border border-slate-900 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-bold text-rose-400"
+              placeholder="0"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -103,7 +153,7 @@ export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete
                       currentPeriod: Math.min(prev.currentPeriod, newTenor)
                     }));
                   }}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none text-slate-200 font-bold"
+                  className="w-full bg-slate-950 border border-slate-900 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none text-slate-200 font-bold"
                 >
                   {Array.from({ length: 36 }, (_, i) => i + 1).map(m => (
                     <option key={m} value={m}>{m} Bulan</option>
@@ -121,9 +171,10 @@ export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete
                 <select
                   value={formData.currentPeriod}
                   onChange={e => setFormData({ ...formData, currentPeriod: parseInt(e.target.value) })}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none text-slate-200 font-bold"
+                  className="w-full bg-slate-950 border border-slate-900 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none text-slate-200 font-bold"
                 >
-                  {Array.from({ length: formData.tenor }, (_, i) => i + 1).map(m => (
+                  <option value={0}>Baru Cair (Bulan ke-0)</option>
+                  {Array.from({ length: 36 }, (_, i) => i + 1).map(m => (
                     <option key={m} value={m}>Bulan ke-{m}</option>
                   ))}
                 </select>
@@ -140,7 +191,7 @@ export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete
               type="date"
               value={formData.startDate}
               onChange={e => setFormData({ ...formData, startDate: e.target.value })}
-              className="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              className="w-full bg-slate-950 border border-slate-900 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             />
           </div>
           
@@ -148,7 +199,7 @@ export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete
             type="submit"
             className="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl active:scale-95 transition-all shadow-lg shadow-blue-900/20"
           >
-            Simpan Hutang
+            {editingId ? 'Perbarui Hutang' : 'Simpan Hutang'}
           </button>
         </form>
       )}
@@ -158,12 +209,11 @@ export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete
           <div className="text-center py-12 text-slate-500 italic">Belum ada catatan hutang</div>
         ) : (
           debts.map(debt => {
-            const monthlyPayment = debt.amount / debt.tenor;
-            const remainingMonths = debt.tenor - debt.currentPeriod;
-            const progress = (debt.currentPeriod / debt.tenor) * 100;
+            const remainingMonths = debt.tenor;
+            const progress = debt.tenor > 0 ? (debt.currentPeriod / (debt.currentPeriod + debt.tenor)) * 100 : 100;
             
             return (
-              <div key={debt.id} className="bg-slate-800/40 border border-slate-700/50 rounded-3xl p-5 relative group overflow-hidden">
+              <div key={debt.id} className="bg-slate-900/10 border border-slate-900 rounded-3xl p-5 relative group overflow-hidden">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full -mr-12 -mt-12 blur-xl group-hover:bg-red-500/10 transition-colors"></div>
                 
                 <div className="flex justify-between items-start mb-4">
@@ -200,17 +250,24 @@ export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete
                     <p className="font-bold text-slate-200">{formatCurrency(debt.amount)}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tenor</p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sisa Tenor</p>
                     <p className="font-bold text-slate-200">{debt.tenor} Bulan</p>
                   </div>
+                </div>
+
+                <div className="bg-black/40 p-4 rounded-2xl border border-slate-900 mb-4 flex justify-between items-center">
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cicilan / Bulan</span>
+                  <span className="font-black text-rose-400">{formatCurrency(debt.monthlyInstallment)}</span>
                 </div>
 
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between items-center text-[10px] font-black uppercase">
                     <span className="text-slate-500">Progress Tenor</span>
-                    <span className="text-blue-400">{debt.currentPeriod} / {debt.tenor} Bulan</span>
+                    <span className="text-blue-400">
+                      {debt.currentPeriod === 0 ? 'Baru Cair' : `Bulan ke-${debt.currentPeriod}`}
+                    </span>
                   </div>
-                  <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
+                  <div className="h-1.5 w-full bg-slate-950 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-blue-500 transition-all duration-1000"
                       style={{ width: `${progress}%` }}
@@ -221,9 +278,22 @@ export const DebtManager: React.FC<DebtManagerProps> = ({ debts, onAdd, onDelete
                   </p>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-slate-700/30 flex justify-between items-center">
-                  <span className="text-xs font-bold text-slate-400">Cicilan / Bulan</span>
-                  <span className="font-black text-red-400">{formatCurrency(monthlyPayment)}</span>
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => handleEdit(debt)}
+                    className="flex items-center justify-center gap-2 py-3 bg-slate-800/50 hover:bg-slate-800 text-slate-200 text-xs font-black uppercase tracking-widest rounded-2xl transition-all"
+                  >
+                    <LucideIcons.Edit3 size={14} />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handlePay(debt)}
+                    disabled={debt.amount <= 0}
+                    className="flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-emerald-900/20 disabled:opacity-50 disabled:grayscale"
+                  >
+                    <LucideIcons.CheckCircle2 size={14} />
+                    Bayar
+                  </button>
                 </div>
               </div>
             );

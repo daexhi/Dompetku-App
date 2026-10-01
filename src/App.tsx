@@ -119,6 +119,10 @@ export default function App() {
     setDebts(prev => [...prev, newDebt]);
   };
 
+  const handleUpdateDebt = (updatedDebt: Debt) => {
+    setDebts(prev => prev.map(d => d.id === updatedDebt.id ? updatedDebt : d));
+  };
+
   const handleDeleteDebt = (id: string) => {
     showConfirm('Hapus Hutang', 'Hapus data hutang ini?', () => {
       setDebts(prev => prev.filter(d => d.id !== id));
@@ -198,8 +202,6 @@ export default function App() {
   const balance = transactions
     .reduce((acc, curr) => acc + (curr.type === 'income' ? curr.amount : -curr.amount), 0);
 
-  const monthlyDebtPayment = debts.reduce((acc, curr) => acc + (curr.amount / curr.tenor), 0);
-
   const confirmDeleteCategory = (id: string) => {
     const cat = categories.find(c => c.id === id);
     showConfirm('Hapus Kategori', `Hapus kategori "${cat?.name || 'ini'}"?`, () => {
@@ -217,7 +219,6 @@ export default function App() {
               income={totalIncome} 
               expense={totalExpense} 
               currency={profile.currency}
-              monthlyDebtPayment={monthlyDebtPayment}
               dateFilter={dateFilter}
               onDateFilterChange={setDateFilter}
               customDate={customDate}
@@ -261,6 +262,7 @@ export default function App() {
             <DebtManager 
               debts={debts} 
               onAdd={handleAddDebt} 
+              onUpdate={handleUpdateDebt}
               onDelete={handleDeleteDebt}
               currency={profile.currency}
             />
@@ -333,8 +335,8 @@ export default function App() {
   if (!isLoaded) return null;
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans text-slate-200 selection:bg-blue-900/50 pb-safe">
-      <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl px-6 py-4 flex justify-between items-center border-b border-slate-800/50">
+    <div className="min-h-screen bg-black font-sans text-slate-200 selection:bg-blue-900/50 pb-safe">
+      <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl px-6 py-4 flex justify-between items-center border-b border-slate-900/50">
         <div>
           <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-0.5">Personal CashFlow</p>
           <h1 className="text-xl font-bold text-white tracking-tight">Alif CashFlow</h1>
@@ -342,7 +344,7 @@ export default function App() {
         <button 
           onClick={() => setActiveTab('settings')}
           className={`p-2.5 rounded-2xl shadow-lg border active:scale-95 transition-all ${
-            activeTab === 'settings' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400'
+            activeTab === 'settings' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-900 border-slate-800 text-slate-400'
           }`}
         >
           <SettingsIcon size={20} />

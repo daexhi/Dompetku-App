@@ -10,8 +10,21 @@ interface CategorySettingsProps {
   onDelete: (id: string) => void;
 }
 
-const COLORS = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6'];
-const ICONS = ['Utensils', 'Car', 'ShoppingBag', 'Gamepad2', 'HeartPulse', 'Wallet', 'TrendingUp', 'PieChart', 'Coffee', 'Gift', 'Home', 'Smartphone'];
+const COLORS = [
+  '#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6',
+  '#f97316', '#84cc16', '#06b6d4', '#d946ef', '#f43f5e', '#a855f7', '#71717a', '#78350f'
+];
+const ICONS = [
+  'Utensils', 'Car', 'ShoppingBag', 'Gamepad2', 'HeartPulse', 'Wallet', 'TrendingUp', 
+  'PieChart', 'Coffee', 'Gift', 'Home', 'Smartphone', 'Shirt', 'Music', 'Book', 
+  'Plane', 'Bus', 'Zap', 'Droplets', 'Wifi', 'CreditCard', 'Coins', 'Activity', 
+  'Apple', 'Beer', 'Bike', 'Briefcase', 'Camera', 'CircleDollarSign', 'CupSoda', 
+  'Dumbbell', 'Egg', 'Film', 'Fuel', 'GraduationCap', 'IceCream', 'Landmark', 
+  'Laptop', 'Library', 'Lifesaver', 'Lightbulb', 'Luggage', 'Mic', 'Package', 
+  'PalmTree', 'PawPrint', 'Pill', 'Pizza', 'PlugZap', 'Radio', 'Scissors', 
+  'Shield', 'ShoppingBasket', 'Stethoscope', 'Sun', 'Ticket', 'TrainFront', 
+  'Umbrella', 'Watch', 'Wrench'
+];
 
 export const CategorySettings: React.FC<CategorySettingsProps> = ({ categories, onAdd, onDelete }) => {
   const [isAdding, setIsAdding] = useState(false);
@@ -95,9 +108,9 @@ export const CategorySettings: React.FC<CategorySettingsProps> = ({ categories, 
 
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-slate-500 uppercase px-1">Pilih Ikon</label>
-              <div className="flex flex-wrap gap-3 bg-slate-900 p-3 rounded-2xl border border-slate-700">
+              <div className="flex flex-wrap gap-3 bg-slate-900 p-3 rounded-2xl border border-slate-700 max-h-48 overflow-y-auto">
                 {ICONS.map(iconName => {
-                  const Icon = (LucideIcons as any)[iconName];
+                  const Icon = (LucideIcons as any)[iconName] || Tag;
                   return (
                     <button
                       key={iconName}

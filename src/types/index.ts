@@ -28,8 +28,9 @@ export interface Debt {
   id: string;
   name: string;
   amount: number;
-  tenor: number; // in months
-  currentPeriod: number; // progress (e.g. month 5 of 12)
+  tenor: number; // total duration in months
+  currentPeriod: number; // current month (e.g. 1)
+  monthlyInstallment: number;
   startDate: string;
   createdAt: string;
 }

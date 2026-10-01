@@ -35,7 +35,7 @@ export const BudgetManager: React.FC<BudgetManagerProps> = ({ categories, budget
         <p className="text-sm text-slate-500 mt-1">Atur budget berdasarkan persentase saldo saat ini</p>
       </div>
 
-      <div className="bg-slate-900/50 p-6 rounded-[2rem] border border-slate-800/50 space-y-4">
+      <div className="bg-slate-900/10 p-6 rounded-[2rem] border border-slate-900 space-y-4">
         <div className="flex justify-between items-center">
           <div>
             <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Total Saldo</p>
@@ -53,7 +53,7 @@ export const BudgetManager: React.FC<BudgetManagerProps> = ({ categories, budget
               {totalAllocated}% / 100%
             </span>
           </div>
-          <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
+          <div className="h-3 w-full bg-black border border-slate-900 rounded-full overflow-hidden">
             <div 
               className={`h-full transition-all duration-500 ${totalAllocated >= 100 ? 'bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.4)]' : 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]'}`}
               style={{ width: `${Math.min(totalAllocated, 100)}%` }}
@@ -78,7 +78,7 @@ export const BudgetManager: React.FC<BudgetManagerProps> = ({ categories, budget
           const maxAllowed = 100 - totalOthers;
 
           return (
-            <div key={cat.id} className="bg-slate-800/40 border border-slate-700/50 rounded-3xl p-5 space-y-4">
+            <div key={cat.id} className="bg-slate-900/10 border border-slate-900 rounded-3xl p-5 space-y-4">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <div className="p-3 rounded-2xl transition-colors" style={{ backgroundColor: `${cat.color}15`, color: cat.color }}>
@@ -108,10 +108,10 @@ export const BudgetManager: React.FC<BudgetManagerProps> = ({ categories, budget
                   step="1"
                   value={budget.percentage}
                   onChange={e => onUpdate(cat.id, Math.min(parseInt(e.target.value), maxAllowed))}
-                  className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500 disabled:opacity-50"
+                  className="w-full h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500 disabled:opacity-50"
                   disabled={maxAllowed <= 0 && budget.percentage === 0}
                 />
-                <div className="flex justify-between text-[8px] text-slate-600 font-bold uppercase tracking-tighter">
+                <div className="flex justify-between text-[8px] text-slate-700 font-bold uppercase tracking-tighter">
                   <span>0%</span>
                   <span>Maks: {maxAllowed}%</span>
                 </div>
